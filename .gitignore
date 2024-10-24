@@ -12,9 +12,13 @@ dist/
 build/
 *.egg-info/
 
-# Data files (if you want to exclude them)
+# Data files (exclude all by default)
 data/*.xlsx
 data/*.csv
+
+# Include example datasets
+!data/examples/*.xlsx
+!data/examples/*.csv
 
 # Environment
 .env
