@@ -1,0 +1,21 @@
+# Jupyter
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution/packaging
+dist/
+build/
+*.egg-info/
+
+# Data files (if you want to exclude them)
+data/*.xlsx
+data/*.csv
+
+# Environment
+.env
+.venv
