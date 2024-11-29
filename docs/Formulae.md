@@ -22,7 +22,7 @@ $$
 $$
 
 _Where:_
-- $d_i = \operatorname{rank}(X_i) - \operatorname{rank}(Y_i)$ is the difference between ranks
+- $d_i = rank(X_i) - rank(Y_i)$ is the difference between ranks
 - $n$ is the number of observations
 
 ## 3. _**Kendall's Tau**_ ($\tau$)
