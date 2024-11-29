@@ -1,12 +1,50 @@
 # TRACES (Time-series Relationship Analysis with Comprehensive Evaluation Suite)
 
+_A Hierarchical Multi-Method Time Series Correlation Analyzer_
+
 ---
 
-_A Hierarchical Multi-Method Time Series Correlation Analyzer_
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Python](https://img.shields.io/badge/python-3.12-blue.svg)
+![Jupyter](https://img.shields.io/badge/Jupyter-Lab-orange.svg)
+![Pandas](https://img.shields.io/badge/pandas-2.2.0-darkblue.svg)
+![NumPy](https://img.shields.io/badge/numpy-2.1.0-lightblue.svg)
+
+---
 
 ## Overview
 
 TRACES is a comprehensive framework for analyzing relationships between time series data using multiple correlation methods. It automatically determines the most appropriate correlation method(s) for each pair of series and provides detailed visualizations and analysis.
+
+## Quick Start
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/SwiftyProjects/TRACES.git
+   cd TRACES
+   ```
+
+2. **Create the conda environment:**
+   ```bash
+   conda env create -f environment.yml
+   conda activate traces-env
+   ```
+
+3. **Launch Jupyter Lab:**
+   ```bash
+   jupyter lab
+   ```
+
+4. **Open the notebook:**
+   - Navigate to `notebooks/TRACES_ES.ipynb`
+   - Run the example analysis using provided sample data
+
+## Example Outputs
+
+See `/docs/examples/` for complete example outputs including:
+- Visualizations of correlation analyses
+- Detailed results from each analysis step
+- Sample data processing demonstrations
 
 ## Key Features
 
@@ -112,3 +150,41 @@ TRACES is a comprehensive framework for analyzing relationships between time ser
 - Automatic handling of missing values
 - Efficient parent-child relationship exclusion
 - Scalable visualization components
+
+## Documentation
+
+- **User Guides:**
+  - [Operational Guide](docs/OperationalGuide.md)
+  - [Component Flexibility Guide](docs/ComponentFlexGuide.md)
+  - [Mathematical Formulae](docs/Formulae.md)
+
+- **Examples:**
+  - Complete example outputs in [/docs/examples/](docs/examples/)
+  - Sample datasets in [/data/examples/](data/examples/)
+
+## Requirements
+
+- Python 3.12+
+- Conda or Miniconda
+- See `environment.yml` for complete dependency list
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Citation
+
+If you use TRACES in your research, please cite:
+```bibtex
+@software{TRACES2024,
+  author = {SwiftyProjects},
+  title = {TRACES: Time-series Relationship Analysis with Comprehensive Evaluation Suite},
+  year = {2024},
+  publisher = {GitHub},
+  url = {https://github.com/SwiftyProjects/TRACES}
+}
+```
