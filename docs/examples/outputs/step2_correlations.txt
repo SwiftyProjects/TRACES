@@ -1,0 +1,29 @@
+# TRACES (Time-series Relationship Analysis with Comprehensive Evaluation Suite)
+
+---
+
+# **Step 2: Core Correlation Analysis Results**
+----------------------------------------
+
+## Top 5 Strongest Correlations
+| Rank | Series 1 | Series 2 | Best Method | Correlation |
+|------|----------|----------|-------------|-------------|
+| 1    | Label_3  | Label_10 | Spearman    | 0.999      |
+| 2    | Label_4  | Label_9  | Pearson     | 0.984      |
+| 3    | Label_5  | Label_6  | Pearson     | 0.965      |
+| 4    | Label_2  | Label_9  | Pearson     | 0.920      |
+| 5    | Label_6  | Label_8  | Pearson     | 0.894      |
+
+## Method Distribution
+| Method   | Count |
+|----------|-------|
+| Pearson  | 31    |
+| Spearman | 13    |
+| Kendall  | 1     |
+
+## Significance Testing Results
+- Pearson significant correlations: 42/45
+- Spearman significant correlations: 40/45
+- Kendall significant correlations: 42/45
+
+_Note: Significance level α = 0.05_

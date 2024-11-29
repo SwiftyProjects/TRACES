@@ -1,11 +1,16 @@
 # Jupyter
 .ipynb_checkpoints/
 */.ipynb_checkpoints/*
+*.nbconvert.ipynb
 
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
 
 # Distribution/packaging
 dist/
@@ -24,6 +29,7 @@ data/*.csv
 .venv
 env/
 venv/
+traces-env/
 
 # IDE
 .idea/
@@ -34,7 +40,13 @@ venv/
 # OS-specific
 .DS_Store
 Thumbs.db
+*~
 
 # Logs and temporary files
 *.log
 *.tmp
+.ipython/
+.jupyter/
+
+# Documentation builds
+docs/_build/

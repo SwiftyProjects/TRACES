@@ -1,0 +1,39 @@
+# TRACES (Time-series Relationship Analysis with Comprehensive Evaluation Suite)
+
+---
+
+# **Step 4: Analysis Framework Results**
+----------------------------------------
+
+## Relationship Type Distribution
+| Type    | Count |
+|---------|-------|
+| Complex | 20    |
+| Linear  | 4     |
+
+## Top 10 Relationships by Confidence Score
+| Series 1 | Series 2 | Type    | Confidence | Best Method    | Max Corr |
+|----------|----------|---------|------------|----------------|----------|
+| Label_3  | Label_10 | Linear  | 0.999      | Pearson        | 0.999    |
+| Label_4  | Label_9  | Linear  | 0.984      | Pearson        | 0.984    |
+| Label_5  | Label_6  | Complex | 0.965      | CCF, Spearman  | 0.965    |
+| Label_2  | Label_9  | Linear  | 0.920      | Pearson        | 0.920    |
+| Label_6  | Label_8  | Complex | 0.894      | CCF, Spearman  | 0.894    |
+| Label_5  | Label_8  | Complex | 0.887      | CCF, Spearman  | 0.887    |
+| Label_2  | Label_8  | Complex | 0.858      | CCF, Spearman  | 0.858    |
+| Label_2  | Label_4  | Linear  | 0.852      | Pearson        | 0.852    |
+| Label_1  | Label_4  | Complex | 0.814      | CCF, Spearman  | 0.814    |
+| Label_1  | Label_9  | Complex | 0.793      | CCF, Spearman  | 0.793    |
+
+## Confidence Statistics
+- Mean Confidence: 0.761
+- Maximum Confidence: 0.999
+- Minimum Confidence: 0.537
+
+## Method Recommendations
+| Best Method    | Count |
+|---------------|-------|
+| CCF, Spearman | 20    |
+| Pearson       | 4     |
+
+_Note: Confidence scores range from 0 to 1_

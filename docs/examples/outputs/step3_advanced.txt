@@ -1,0 +1,23 @@
+# TRACES (Time-series Relationship Analysis with Comprehensive Evaluation Suite)
+
+---
+
+# **Step 3: Advanced Correlation Methods Results**
+----------------------------------------
+
+## Top 5 Advanced Analysis Results
+| Series 1 | Series 2 | CCF Max | Optimal Lag | CCF Zero Lag | Best Delayed Lag |
+|----------|----------|---------|-------------|--------------|------------------|
+| Label_3  | Label_10 | 50.928  | 0           | 50.928       | 0               |
+| Label_4  | Label_9  | 50.204  | 0           | 50.204       | -1              |
+| Label_5  | Label_6  | 49.204  | 0           | 49.204       | 1               |
+| Label_2  | Label_9  | 46.904  | 0           | 46.904       | 1               |
+| Label_6  | Label_8  | 45.611  | 0           | 45.611       | 3               |
+
+## Summary Statistics
+- Average Optimal Lag: 0.00
+- Maximum CCF Correlation: 50.9282
+- Pairs showing zero lag: 60%
+- Pairs showing delayed relationships: 40%
+
+_Note: CCF values normalized to percentage scale (0-100)_
