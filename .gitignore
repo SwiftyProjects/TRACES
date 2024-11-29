@@ -15,7 +15,6 @@ build/
 # Data files (exclude all by default)
 data/*.xlsx
 data/*.csv
-
 # Include example datasets
 !data/examples/*.xlsx
 !data/examples/*.csv
@@ -23,3 +22,19 @@ data/*.csv
 # Environment
 .env
 .venv
+env/
+venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
