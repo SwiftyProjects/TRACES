@@ -4,74 +4,126 @@
 
 # **Operational Guide**
 
-## Cell Dependencies and Execution Flows
+## 1. Installation
 
-### Initial Setup/Modification
+TRACES is a standard Python package (`pyproject.toml`), so any environment manager works.
 
-**Full Sequential Execution (1-6) Required When:**
-- Performing first-time setup
-- Modifying any functions
-- Adjusting core parameters
-- Implementing new methods
-- Updating visualization components
+| Tool | Commands |
+|---|---|
+| **uv** (recommended) | `uv sync --all-extras` then prefix commands with `uv run` |
+| **venv + pip** | `python -m venv .venv`, activate it, `pip install -e ".[notebook]"` |
+| **conda / mamba** | `conda env create -f environment.yml` then `conda activate traces-env` |
 
-### *Standard Analysis Workflows*
+The `notebook` extra adds JupyterLab. For development, `uv sync --all-extras` also installs the
+`dev` group (pytest, nbmake, ruff); with pip use `pip install --group dev` (pip 25.1+).
 
-#### Minimum Required Flow
-1. **Cell 1** (Setup & Environment) - *Always Required*
-2. **Cell 6** (Full Analysis) - *Primary Execution*
+## 2. Three ways to run an analysis
 
-#### Targeted Analysis Options
+### A. Notebook (`notebooks/TRACES_ES.ipynb`)
 
-**Visualization Focus:**
-- Cell 1 → Cell 5
-- Enables all visualization capabilities
-- Requires relationship matrix parameter alignment (even number of top pairs)
+Run all cells top to bottom. Every step depends only on Step 1, so after changing settings in
+Step 1, re-run from Step 1 (no kernel restart needed).
 
-**Method Comparison:**
-- Cell 1 → Cell 4
-- Focuses on correlation method analysis
+| Step | Purpose | Edit? |
+|---|---|---|
+| 1. Setup and data loading | Choose `DATA_FILE`, `EXCLUDE`, `CONFIG`; inspect series and persistence | **Yes** |
+| 2. Run the analysis | `analyze(...)` and headline summary | No |
+| 3. Correlations and significance | Coefficients, raw vs adjusted significance, comparison plot | No |
+| 4. Lead/lag analysis | Detected lead/lags, CCF overview, per-pair CCF | No |
+| 5. Relationship classification | Types, evidence scores, matrix, method and rolling plots | No |
+| 6. Export and v1 comparison | Write `results/`, compare with `AnalysisConfig.classic()` | Optional |
 
-### Use Case Scenarios
+### B. Command line
 
-#### A. Complete Dataset Analysis
-1. Sequential execution: Cells 1 → 2 → 3 → 4 → 5 → 6
-2. Provides:
-   - Comprehensive correlation analysis
-   - Full visualization suite
-   - Detailed statistical insights
-   - Relationship classifications
+```bash
+traces analyze PATH [options]
+```
 
-#### B. Visualization Exploration
-1. Execute: Cell 1 → Cell 4 → Cell 5
-2. Delivers:
-   - Correlation comparisons
-   - Relationship matrix (top N pairs)
-   - Method performance analysis
-   - CCF pattern visualization
+| Option | Default | Description |
+|---|---|---|
+| `-o, --out DIR` | `results` | Output directory |
+| `--time-column NAME` | first column | Time column |
+| `--sheet NAME_OR_INDEX` | `0` | Excel worksheet |
+| `--missing {raise,drop,interpolate}` | `raise` | Missing-value policy |
+| `--exclude PARENT=CHILD[,CHILD]` | none | Exclude parent/child pairs (repeatable) |
+| `--rolling-window N` | 12 | Rolling window |
+| `--max-lag N` | 10 | Lag search range |
+| `--alpha A` | 0.05 | Significance level |
+| `--min-correlation R` | 0.3 | Minimum strength |
+| `--detrend {none,linear,difference}` | `none` | Pre-processing |
+| `--no-autocorrelation-adjustment`, `--no-fdr`, `--no-prewhiten` | | Disable one safeguard |
+| `--classic` | | Disable all three (v1-style) |
+| `--top N` | 10 | Pairs listed in the report |
+| `--no-figures`, `--no-excel` | | Skip those outputs |
 
-#### C. Methodology Validation
-1. Required: Cells 1-4
-2. Useful for:
-   - Testing correlation methods
-   - Validating classifications
-   - Assessing confidence metrics
+Outputs: `results.csv`, `results.xlsx` (results, summary, config sheets), `report.md` and
+`figures/*.png`. Exit code 2 signals invalid input.
 
-### _Important Notes_
+### C. Python API
 
-**State Management:**
-- Notebook maintains state until kernel reset
-- Cell 6 contains consolidated function calls
-- Parent-child relationships persist through session
+```python
+from traces_ts import AnalysisConfig, analyze, load_data, render_markdown, viz
 
-**Performance Considerations:**
-- Clear outputs between analysis runs
-- Restart kernel when modifying parent-child mappings
-- Consider batch processing for large datasets
-- Relationship matrix visualization optimized for even number of top pairs
+data = load_data("my_data.csv", time_column="Date", missing="interpolate")
+config = AnalysisConfig(max_lag=12, detrend="difference")
+result = analyze(data, config, exclude={"Total": ["North", "South"]})
 
-**Best Practices:**
-- Validate data structure before full analysis
-- Monitor memory usage with large datasets
-- Review visualization parameters for optimal display
-- Ensure correlation pair count aligns with visualization requirements
+result.table  # one row per pair
+result.top(10)  # by evidence score
+result.by_type("lagged")  # filter by relationship type
+result.pair("North", "West").ccf  # CCFResult with lags, values, band
+result.summary()  # dict of headline statistics
+
+fig = viz.plot_pair_ccf(result, "North", "West")
+result.to_excel("results/my_results.xlsx")
+```
+
+Lower-level building blocks (`basic_correlations`, `cross_correlation`,
+`prewhitened_cross_correlation`, `lagged_correlations`, `effective_sample_size`,
+`classify_relationship`) can be used on any pair of arrays.
+
+## 3. Results table columns
+
+| Column | Meaning |
+|---|---|
+| `series_1`, `series_2` | The pair |
+| `relationship_type` | `linear`, `non_linear`, `lagged`, `complex`, `none` |
+| `evidence_score` | 0-1 ranking of strength x statistical support |
+| `recommended_methods` | Methods suited to the relationship type |
+| `strongest_method`, `max_abs_correlation` | Method with the largest absolute coefficient |
+| `pearson`, `spearman`, `kendall` | Coefficients |
+| `*_p` | Final p-values (autocorrelation-adjusted, FDR-corrected as configured) |
+| `*_p_raw` | Naive p-values assuming independent observations |
+| `significant_methods` | Number of methods with `*_p < alpha` |
+| `n_obs`, `n_effective` | Observations and effective sample size |
+| `rolling_mean`, `rolling_std` | Rolling correlation level and stability |
+| `ccf_zero_lag`, `ccf_peak`, `ccf_peak_lag` | Detection CCF at lag 0 and at its peak (positive lag: series_1 leads) |
+| `ccf_band`, `ccf_peak_significant` | Significance band and whether the peak exceeds it |
+| `lag_ratio`, `lag_detected` | Peak / zero-lag ratio and final lead/lag decision |
+
+## 4. Interpreting results
+
+- **Start with `relationship_type` and `evidence_score`**, then check `n_effective`: a value far below
+  `n_obs` means the series are smooth and there is less independent evidence than the row count suggests.
+- **Compare `*_p_raw` with `*_p`.** Pairs significant only under raw p-values are likely artifacts
+  of shared trends or autocorrelation.
+- **Heed the persistence note** in reports. For random-walk-like data, re-run with
+  `detrend="difference"`; relationships that survive are much more credible.
+- **Lagged relationships** are hypotheses: inspect `viz.plot_pair_ccf` and consider domain plausibility.
+- **`complex`** usually means the strength changes over time; look at `viz.plot_rolling_correlation`.
+
+## 5. Performance
+
+Pairs grow quadratically: 10 series give 45 pairs, 100 series give 4,950. Analysis of the 45 sample
+pairs takes well under a second. For thousands of pairs pass `keep_details=False` to save memory,
+and use `pairs=` to analyse a subset. `lagged_correlations` (all three methods at every lag) is not
+run by `analyze`; call it on demand for specific pairs.
+
+## 6. Development workflow
+
+```bash
+uv run pytest                              # unit and calibration tests
+uv run pytest --nbmake notebooks           # execute the notebook
+uv run ruff check . && uv run ruff format .
+uv run python scripts/generate_examples.py # refresh docs/examples
+```

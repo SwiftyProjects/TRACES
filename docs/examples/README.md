@@ -2,104 +2,53 @@
 
 ---
 
-# TRACES Example Outputs README
+# **Example Outputs**
 
-This directory contains example outputs generated using the TRACES analytical framework. All examples are generated using the primary sample dataset `TRACES_sample_52x10_dataset_A1.xlsx`.
+Everything in this directory is generated from the bundled sample datasets by
 
----
+```bash
+uv run python scripts/generate_examples.py
+```
 
-TRACES/
-├── data
-│   └── examples
-│       ├── TRACES_sample_52x10_dataset_A1.xlsx		# Link to reference source data in /data/examples/
-│       └── TRACES_sample_52x10_dataset_B1.xlsx		# bonus time-series dataset to try, example outputs not provided
-├── docs
-│   ├── ComponentFlexGuide.md
-│   ├── Formulae.md
-│   ├── OperationalGuide.md
-│   └── examples
-│       ├── README.md				        # **THIS FILE**
-│       ├── outputs
-│       │   ├── step1_setup.txt			    # Initial data loading results
-│       │   ├── step2_correlations.txt		# Core correlation analysis
-│       │   ├── step3_advanced.txt		    # Advanced correlation methods
-│       │   ├── step4_framework.txt		    # Analysis framework results
-│       │   └── step6_full_analysis.txt		# Complete dataset analysis
-│       └── visualizations
-│           ├── ccf_analysis.png		    # CCF Analysis scatter plot
-│           ├── correlation_comparison.png	# Method comparison bar plot
-│           ├── method_performance.png		# Performance by relationship type
-│           └── relationship_matrix.png		# Confidence score matrix
+so it always matches the current code.
 
----
+```
+docs/examples/
+├── README.md                       # this file
+├── outputs/
+│   ├── report_A1.md                # full report, dataset A1, v2 defaults
+│   ├── report_A1_classic.md        # same data with AnalysisConfig.classic() (v1-style statistics)
+│   ├── classic_vs_v2_A1.csv        # relationship-type counts, classic vs v2
+│   ├── results_A1.csv              # full results table, dataset A1
+│   └── report_B1.md                # full report, dataset B1
+└── visualizations/                 # dataset A1, v2 defaults
+    ├── correlation_comparison.png  # Pearson / Spearman / Kendall for the strongest pairs
+    ├── relationship_matrix.png     # all pairs: type and evidence score
+    ├── method_performance.png      # strongest method by relationship type
+    ├── ccf_analysis.png            # peak pre-whitened CCF vs lag
+    └── ccf_<pair>.png              # per-pair CCF with significance band (top pairs)
+```
 
-# TRACES Example Outputs
+## Source datasets
 
-This directory contains example outputs generated using the TRACES analytical framework. All examples are generated using the primary sample dataset `TRACES_sample_52x10_dataset_A1.xlsx`.
+`data/examples/TRACES_sample_52x10_dataset_A1.xlsx` and `..._B1.xlsx`: 52 weekly time points,
+a `Time` column and 10 series (`Label_1` to `Label_10`).
 
-## Source Dataset Reference
-Primary dataset: `/data/examples/TRACES_sample_52x10_dataset_A1.xlsx`
-- 52 time points (weekly intervals)
-- 11 columns total:
-  - Time column
-  - 10 time series (Label_1 through Label_10)
-- Used to generate all example outputs shown here
+## Key results for dataset A1
 
-Note: An additional sample dataset (`TRACES_sample_52x10_dataset_B1.xlsx`) is provided in the same directory for users to practice with different time series data.
+| Relationship type | Classic (v1-style) | v2 default |
+|---|---|---|
+| linear | 4 | 4 |
+| non_linear | 0 | 0 |
+| lagged | 7 | 0 |
+| complex | 33 | 5 |
+| none | 1 | 36 |
 
-## Directory Contents
-
-### Output Files (`/outputs/`)
-
-Step-by-step analysis results from the TRACES notebook:
-1. `step1_setup.txt` - Initial data loading and validation
-2. `step2_correlations.txt` - Basic correlation analysis
-3. `step3_advanced.txt` - Advanced correlation methods
-4. `step4_framework.txt` - Analysis framework results
-5. `step6_full_analysis.txt` - Complete dataset analysis
-
-### Visualizations (`/visualizations/`)
-
-Four key visualization outputs:
-
-1. `ccf_analysis.png` - Cross-correlation function analysis scatter plot
-   - Shows relationship between maximum correlation and optimal lag
-   - Color indicates confidence score
-
-2. `correlation_comparison.png` - Method comparison bar plot
-   - Compares Pearson, Spearman, and Kendall methods
-   - Shows relative performance across pairs
-
-3. `method_performance.png` - Performance by relationship type
-   - Distribution of best methods
-   - Breakdown by relationship classification
-
-4. `relationship_matrix.png` - Confidence score matrix
-   - Heatmap of relationship types
-   - Color intensity shows confidence level
-
-## Key Analysis Results
-
-1. **Relationship Types Found**
-   - Complex: 33 pairs
-   - Lagged: 7 pairs
-   - Linear: 4 pairs
-   - Non-linear: 1 pair
-
-2. **Correlation Strength Distribution**
-   - Strong correlations (>0.7): 15 pairs
-   - Moderate correlations (0.3-0.7): 26 pairs
-   - Weak correlations (<0.3): 4 pairs
-
-3. **Method Performance**
-   - Primary methods: CCF+Spearman (complex relationships), Pearson (linear)
-   - Overall mean confidence score: 0.582
-   - Highest confidence: 0.999 (Label_3 vs Label_10)
-
-## Usage Notes
-
-- All outputs are reproducible using the primary sample dataset
-- Examples exhibit the dynamic range of TRACES capabilities
-- Text outputs provide detailed analysis at each step
-- Visualizations show key relationships and patterns
-- Reference the `OperationalGuide.md` for execution details
+The same four linear relationships (`Label_3`/`Label_10`, `Label_4`/`Label_9`, `Label_2`/`Label_9`,
+`Label_2`/`Label_4`) are found by both classic and v2 statistics, and with linear detrending. Three of
+them also hold for first differences (`detrend="difference"`), where `Label_7`/`Label_8` replaces
+`Label_2`/`Label_9`, so those three are the most robust findings in this dataset. Most other
+"relationships" reported by v1-style statistics do not survive once autocorrelation is taken into
+account: the series are very smooth (lag-1 autocorrelation 0.95-1.00), so their 52 points carry the
+information of only about 9 independent observations. The seven v1 "lagged" pairs were artifacts of
+the unrestricted lag search and missing pre-whitening.
