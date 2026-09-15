@@ -56,3 +56,24 @@ def test_ccf_frame(rng):
     df = cross_correlation(*rng.normal(size=(2, 30)), max_lag=2).to_frame()
     assert list(df.columns) == ["lag", "ccf"]
     assert len(df) == 5
+
+
+def test_prewhitened_detection_is_order_independent(rng):
+    n = 80
+    x = np.cumsum(rng.normal(size=n))
+    y = np.cumsum(rng.normal(size=n))
+    xy = prewhitened_cross_correlation(x, y, 8)
+    yx = prewhitened_cross_correlation(y, x, 8)
+    np.testing.assert_allclose(xy.values, yx.values[::-1])
+    assert xy.peak_lag == -yx.peak_lag
+    assert xy.band == pytest.approx(yx.band)
+
+
+def test_band_widens_with_leftover_autocorrelation(rng):
+    smooth = np.convolve(rng.normal(size=300), np.ones(15) / 15, mode="valid")
+    other = np.convolve(rng.normal(size=300), np.ones(15) / 15, mode="valid")
+    naive = cross_correlation(smooth, other, 10)
+    pw = prewhitened_cross_correlation(smooth, other, 10, max_ar_order=1)
+    assert pw.n_band <= pw.n
+    assert pw.band >= stats.norm.ppf(1 - 0.05 / 42) / np.sqrt(pw.n) - 1e-12
+    assert naive.n_band == naive.n

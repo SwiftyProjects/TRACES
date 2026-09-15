@@ -118,17 +118,23 @@ def ar_filter(x: ArrayLike, phi: ArrayLike) -> FloatArray:
 
 def prewhiten(
     x: ArrayLike, y: ArrayLike, max_order: int | None = None
-) -> tuple[FloatArray, FloatArray, int]:
-    """Box-Jenkins pre-whitening: filter both series with the AR model fitted to ``x``.
+) -> tuple[FloatArray, FloatArray, tuple[int, int]]:
+    """Double pre-whitening: filter each series with its own AR model.
 
-    Removing x's own autocorrelation makes the cross-correlation of the filtered
-    series interpretable against white-noise significance bands.
+    Removing each series' autocorrelation makes their residual cross-correlation
+    interpretable against white-noise significance bands (Haugh, 1976). Unlike
+    single (Box-Jenkins) pre-whitening, the result does not depend on pair order.
+    Residuals are aligned on the later start so both have the same length.
 
     Returns:
-        (filtered_x, filtered_y, ar_order)
+        (filtered_x, filtered_y, (ar_order_x, ar_order_y))
     """
     n = len(np.asarray(x))
     if max_order is None:
         max_order = min(10, max(1, n // 5))
-    phi = fit_ar(x, max_order)
-    return ar_filter(x, phi), ar_filter(y, phi), len(phi)
+    phi_x, phi_y = fit_ar(x, max_order), fit_ar(y, max_order)
+    px, py = len(phi_x), len(phi_y)
+    start = max(px, py)
+    fx = ar_filter(x, phi_x)[start - px :]
+    fy = ar_filter(y, phi_y)[start - py :]
+    return fx, fy, (px, py)

@@ -45,7 +45,7 @@ class AnalysisConfig:
     """Apply Benjamini-Hochberg FDR control across all pairs, per method."""
 
     prewhiten: bool = True
-    """Pre-whiten both series with an AR model of series 1 before lag detection."""
+    """Pre-whiten each series with its own AR model before lag detection."""
 
     max_ar_order: int | None = None
     """Upper bound for the pre-whitening AR order (default: min(10, n // 5))."""

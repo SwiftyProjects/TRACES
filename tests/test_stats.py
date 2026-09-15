@@ -76,7 +76,9 @@ def test_fit_ar_recovers_ar1(rng):
 
 def test_prewhiten_removes_autocorrelation(rng):
     x = ar1(rng, 500, 0.9)
-    fx, fy, order = prewhiten(x, x.copy(), max_order=5)
-    assert order >= 1
-    assert len(fx) == len(fy) == 500 - order
+    y = rng.normal(size=500)
+    fx, fy, (px, py) = prewhiten(x, y, max_order=5)
+    assert px >= 1
+    assert len(fx) == len(fy) == 500 - max(px, py)
     assert abs(autocorrelation(fx, 1)[1]) < 0.1
+    assert abs(autocorrelation(fy, 1)[1]) < 0.1

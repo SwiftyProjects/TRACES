@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from matplotlib.colors import ListedColormap
 from matplotlib.figure import Figure
 
 from .classify import RELATIONSHIP_TYPES
@@ -53,37 +54,53 @@ def plot_relationship_matrix(
     value: str = "evidence_score",
     figsize: tuple[float, float] | None = None,
 ) -> Figure:
-    """Lower-triangle matrix of all series, colored by ``value`` and labelled by relationship type."""
+    """Lower-triangle matrix of all series, colored by ``value`` and labelled by relationship type.
+
+    Grey cells were analysed but show no relationship; blank cells were not analysed
+    (e.g. excluded parent/child pairs). ``LAG+k`` means the row series leads the column
+    series by k observations.
+    """
     names = result.data.series
-    size = len(names)
     values = pd.DataFrame(np.nan, index=names, columns=names)
     labels = pd.DataFrame("", index=names, columns=names)
+    unrelated = pd.DataFrame(False, index=names, columns=names)
     for row in result.table.itertuples(index=False):
-        label = TYPE_ABBREVIATIONS[row.relationship_type]
-        if row.relationship_type == "lagged":
-            label += f"{row.ccf_peak_lag:+d}"
-        for a, b, lab in ((row.series_1, row.series_2, label), (row.series_2, row.series_1, label)):
+        for a, b, sign in ((row.series_1, row.series_2, 1), (row.series_2, row.series_1, -1)):
+            label = TYPE_ABBREVIATIONS[row.relationship_type]
+            if row.relationship_type == "lagged":
+                label += f"{sign * row.ccf_peak_lag:+d}"
             values.loc[a, b] = getattr(row, value)
-            labels.loc[a, b] = lab
+            labels.loc[a, b] = label
+            unrelated.loc[a, b] = row.relationship_type == "none"
 
-    mask = np.triu(np.ones((size, size), dtype=bool)) | values.isna().to_numpy()
+    # Lower triangle without the empty first row and last column
+    values, labels, unrelated = (df.iloc[1:, :-1] for df in (values, labels, unrelated))
+    upper = np.triu(np.ones(values.shape, dtype=bool), k=1)
+    size = len(names)
     figsize = figsize or (max(6, 0.8 * size + 3), max(5, 0.7 * size + 2))
     fig, ax = plt.subplots(figsize=figsize)
+    common = {"linewidths": 0.5, "linecolor": "white", "square": True, "ax": ax}
+    sns.heatmap(
+        unrelated.astype(float),
+        mask=upper | ~unrelated.to_numpy(),
+        cmap=ListedColormap(["#e3e3e3"]),
+        cbar=False,
+        **common,
+    )
     sns.heatmap(
         values,
-        mask=mask,
+        mask=upper | unrelated.to_numpy() | values.isna().to_numpy(),
         annot=labels,
         fmt="",
         cmap="viridis",
         vmin=0,
         vmax=1,
-        linewidths=0.5,
-        linecolor="white",
-        square=True,
-        ax=ax,
         cbar_kws={"label": value.replace("_", " ").capitalize()},
+        **common,
     )
-    ax.set_title("Relationship matrix (LIN linear, NL non-linear, LAG lagged, CX complex)")
+    ax.set_title(
+        "Relationship matrix (LIN linear, NL non-linear, LAG lagged, CX complex; grey: none)"
+    )
     fig.tight_layout()
     return fig
 
@@ -150,6 +167,7 @@ def plot_ccf_overview(result: AnalysisResult, figsize: tuple[float, float] = (11
     ax.set_title(f"Peak {kind}cross-correlation vs lag (positive lag: series 1 leads)")
     ax.set_xlabel("Lag at peak |CCF|")
     ax.set_ylabel("|CCF| at peak")
+    ax.margins(x=0.12)
     ax.grid(alpha=0.3)
     ax.legend(loc="best")
     fig.tight_layout()
@@ -178,7 +196,11 @@ def plot_pair_ccf(
     ax.axhline(0, color="0.3", lw=0.8)
     ax.set_xlabel(f"Lag k: corr({series_1}[t], {series_2}[t+k])")
     ax.set_ylabel("CCF")
-    note = f", AR({ccf.ar_order}) pre-whitened" if ccf.ar_order is not None else ""
+    note = (
+        f", pre-whitened AR({ccf.ar_order[0]})/AR({ccf.ar_order[1]})"
+        if ccf.ar_order is not None
+        else ""
+    )
     ax.set_title(f"{series_1} vs {series_2}: peak {ccf.peak:+.2f} at lag {ccf.peak_lag:+d}{note}")
     ax.legend(loc="best", fontsize=8)
     fig.tight_layout()
