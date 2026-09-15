@@ -1,43 +1,42 @@
 # Jupyter
 .ipynb_checkpoints/
-*/.ipynb_checkpoints/*
 *.nbconvert.ipynb
 
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
 .pytest_cache/
+.ruff_cache/
 .coverage
 coverage.xml
 htmlcov/
 
-# Distribution/packaging
+# Build / packaging
 dist/
 build/
 *.egg-info/
 
-# Data files (exclude all by default)
+# Environments
+.env
+.venv/
+venv/
+env/
+traces-env/
+
+# Data files (exclude all by default, keep bundled examples)
 data/*.xlsx
 data/*.csv
-# Include example datasets
 !data/examples/*.xlsx
 !data/examples/*.csv
 
-# Environment
-.env
-.venv
-env/
-venv/
-traces-env/
+# Analysis outputs (CLI / notebook exports)
+results/
+notebooks/results/
 
-# IDE
+# IDE / OS
 .idea/
 .vscode/
 *.swp
-*.swo
-
-# OS-specific
 .DS_Store
 Thumbs.db
 *~
@@ -45,8 +44,3 @@ Thumbs.db
 # Logs and temporary files
 *.log
 *.tmp
-.ipython/
-.jupyter/
-
-# Documentation builds
-docs/_build/

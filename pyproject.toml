@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "traces-ts"
+version = "2.0.0"
+description = "TRACES: Time-series Relationship Analysis with Comprehensive Evaluation Suite"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "SwiftyProjects" }]
+requires-python = ">=3.11"
+keywords = ["time series", "correlation", "cross-correlation", "lag analysis", "statistics"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "scipy>=1.11",
+    "matplotlib>=3.8",
+    "seaborn>=0.13",
+    "openpyxl>=3.1",
+]
+
+[project.optional-dependencies]
+notebook = ["jupyterlab>=4.3", "ipykernel>=6.29"]
+
+[project.scripts]
+traces = "traces_ts.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/SwiftyProjects/TRACES"
+Issues = "https://github.com/SwiftyProjects/TRACES/issues"
+Changelog = "https://github.com/SwiftyProjects/TRACES/blob/main/CHANGELOG.md"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "nbmake>=1.5",
+    "ipykernel>=6.29",
+    "ruff>=0.12",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/traces_ts"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/traces_ts", "tests", "README.md", "LICENSE", "CHANGELOG.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+filterwarnings = ["error::FutureWarning", "error::DeprecationWarning:traces_ts.*"]
+
+[tool.coverage.run]
+source = ["traces_ts"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-include = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "NPY", "PD", "SIM", "RUF"]
+ignore = ["E501"]  # line length is handled by ruff format
+
+[tool.ruff.lint.per-file-ignores]
+"notebooks/*.ipynb" = ["E402", "B018"]
+"tests/*" = ["PD"]

@@ -1,23 +1,11 @@
+# Optional conda/mamba environment. The primary, tool-agnostic setup is pyproject.toml:
+#   uv sync --all-extras          (recommended)
+#   pip install -e ".[notebook]"  (any venv)
 name: traces-env
 channels:
   - conda-forge
-  - defaults
 dependencies:
-  - python=3.12
-  - numpy>=2.1.0
-  - pandas>=2.2.0
-  - scipy>=1.14.0
-  - matplotlib>=3.9.0
-  - seaborn>=0.13.0
-  - jupyterlab>=4.3.0
-  - openpyxl>=3.1.0 
-  - pytest>=8.3.0
-  - pytest-cov>=6.0.0
-  - black>=24.0.0
-  - flake8>=7.0.0
-  - ipywidgets>=8.1.0
-  # Development tools
-  - pip>=24.0
+  - python=3.13
+  - pip
   - pip:
-    - nbformat>=5.10.0
-    - nbconvert>=7.16.0
+      - -e .[notebook]
