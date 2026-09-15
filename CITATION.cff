@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use TRACES in your research, please cite it as below."
+title: "TRACES: Time-series Relationship Analysis with Comprehensive Evaluation Suite"
+type: software
+authors:
+  - name: SwiftyProjects
+version: 2.0.0
+date-released: 2026-09-15
+license: MIT
+repository-code: "https://github.com/SwiftyProjects/TRACES"
+keywords:
+  - time series
+  - correlation
+  - cross-correlation
+  - lead-lag analysis
+  - autocorrelation

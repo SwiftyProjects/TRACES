@@ -1,0 +1,6 @@
+relationship_type,classic (v1-style),v2 default
+linear,4,4
+non_linear,0,0
+lagged,7,0
+complex,33,5
+none,1,36
