@@ -33,7 +33,7 @@ It ships as a small Python package (`traces_ts`), a guided Jupyter notebook and 
 
 Classical p-values assume independent observations. Most real time series are autocorrelated, and
 then those p-values are badly over-optimistic. In simulations with **independent** series of 52
-points, the naive Pearson test called 56-67% of pairs significant (it should be 5%). TRACES v2
+points, the naive Pearson test called 51-67% of pairs significant (it should be 5%). TRACES v2
 adjusts for this by default:
 
 | Independent series (n=52) | naive p < 0.05 | TRACES v2 | naive lag detection | TRACES v2 |
