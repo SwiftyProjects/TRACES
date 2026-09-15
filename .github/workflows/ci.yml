@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - run: uv sync --locked --all-extras
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+
+  test:
+    name: test (${{ matrix.os }}, py${{ matrix.python }}${{ matrix.resolution == 'lowest-direct' && ', lowest deps' || '' }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.11", "3.12", "3.13", "3.14"]
+        resolution: [locked]
+        include:
+          - os: windows-latest
+            python: "3.13"
+            resolution: locked
+          - os: macos-latest
+            python: "3.13"
+            resolution: locked
+          - os: ubuntu-latest
+            python: "3.11"
+            resolution: lowest-direct
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install (locked)
+        if: matrix.resolution == 'locked'
+        run: uv sync --locked --all-extras
+      - name: Install (lowest direct dependencies)
+        if: matrix.resolution == 'lowest-direct'
+        run: uv sync --all-extras --resolution lowest-direct --upgrade
+      - name: Tests
+        run: uv run --no-sync pytest --cov --cov-report=term-missing
+      - name: Notebook
+        run: uv run --no-sync pytest --nbmake notebooks
+      - name: CLI smoke test
+        run: uv run --no-sync traces analyze data/examples/TRACES_sample_52x10_dataset_A1.xlsx --out results
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+      - run: uv build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/

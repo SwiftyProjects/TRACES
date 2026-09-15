@@ -2882,7 +2882,7 @@ requires-dist = [
     { name = "openpyxl", specifier = ">=3.1" },
     { name = "pandas", specifier = ">=2.2" },
     { name = "scipy", specifier = ">=1.11" },
-    { name = "seaborn", specifier = ">=0.13" },
+    { name = "seaborn", specifier = ">=0.13.2" },
 ]
 provides-extras = ["notebook"]
 
